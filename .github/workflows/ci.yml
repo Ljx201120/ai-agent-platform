@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-task-service:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Build task-service
+        working-directory: services/task
+        run: go build ./...
+
+      - name: Test task-service
+        working-directory: services/task
+        run: go test ./...
+
+      - name: Build Docker image
+        run: |
+          docker build -t task-service:${{ github.sha }} ./services/task
+
+  build-agent-service:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Build agent-service
+        working-directory: services/agent
+        run: go build ./...
+
+      - name: Test agent-service
+        working-directory: services/agent
+        run: go test ./...
+
+      - name: Build Docker image
+        run: |
+          docker build -t agent-service:${{ github.sha }} ./services/agent

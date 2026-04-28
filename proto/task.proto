@@ -1,0 +1,33 @@
+syntax = "proto3";
+package task;
+
+enum TaskStatus {
+  PENDING   = 0;
+  RUNNING   = 1;
+  COMPLETED = 2;
+  FAILED    = 3;
+}
+
+message Task {
+  string id          = 1;
+  string user_id     = 2;
+  string prompt      = 3;
+  TaskStatus status  = 4;
+  string result      = 5;
+  string created_at  = 6;
+  string updated_at  = 7;
+}
+
+message CreateTaskRequest {
+  string user_id = 1;
+  string prompt  = 2;
+}
+
+message GetTaskRequest {
+  string id = 1;
+}
+
+service TaskService {
+  rpc CreateTask(CreateTaskRequest) returns (Task);
+  rpc GetTask(GetTaskRequest)       returns (Task);
+}
