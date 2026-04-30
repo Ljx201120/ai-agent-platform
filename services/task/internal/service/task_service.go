@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/Ljx201120/ai-agent-platform/task/internal/event"
+	"github.com/Ljx201120/ai-agent-platform/task/internal/metric"
 	"github.com/Ljx201120/ai-agent-platform/task/internal/model"
 	"github.com/Ljx201120/ai-agent-platform/task/internal/repository"
 )
@@ -41,7 +42,7 @@ func (s *taskService) CreateTask(ctx context.Context, userID, prompt string) (*m
 	if err := s.repo.Create(ctx, task); err != nil {
 		return nil, err
 	}
-
+	metric.TaskCreatedTotal.Inc()
 	// 发布事件到 Redis Stream
 	if err := s.publisher.PublishTaskCreated(ctx, task.ID, task.Prompt); err != nil {
 		return nil, err

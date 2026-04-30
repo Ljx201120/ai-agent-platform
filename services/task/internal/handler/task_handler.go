@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/Ljx201120/ai-agent-platform/task/internal/metric"
 	"github.com/Ljx201120/ai-agent-platform/task/internal/service"
 )
 
@@ -39,6 +40,9 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, task)
+
+	// CreateTask 里创建成功后加
+	metric.TaskCreatedTotal.Inc()
 }
 
 func (h *TaskHandler) GetTask(c *gin.Context) {

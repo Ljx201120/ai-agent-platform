@@ -13,9 +13,11 @@ import (
 	"github.com/Ljx201120/ai-agent-platform/task/config"
 	"github.com/Ljx201120/ai-agent-platform/task/internal/event"
 	"github.com/Ljx201120/ai-agent-platform/task/internal/handler"
+	"github.com/Ljx201120/ai-agent-platform/task/internal/metric"
 	"github.com/Ljx201120/ai-agent-platform/task/internal/model"
 	"github.com/Ljx201120/ai-agent-platform/task/internal/repository"
 	"github.com/Ljx201120/ai-agent-platform/task/internal/service"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -48,12 +50,14 @@ func main() {
 	repo := repository.NewTaskRepository(db)
 	svc := service.NewTaskService(repo, publisher)
 	h := handler.NewTaskHandler(svc)
-
+	metric.Init()
 	r := gin.Default()
 	h.RegisterRoutes(r)
-
+	// main 函数里加
+	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	log.Println("Task Service 启动，监听 :8081")
 	if err := r.Run(":8081"); err != nil {
 		log.Fatalf("启动失败: %v", err)
 	}
+
 }
